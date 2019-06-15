@@ -1,0 +1,42 @@
+
+carbaryl:
+  colour: purple # It could be.
+  LD50: 123.456 # mg/kg bodymass
+  maxResidualLevel: 234.567 # mg/kg bodymass
+  consumableLevel: 345.0 # mg/kg bodymass
+
+carbofuran:
+  colour: blue
+  LD50: 123.456 # mg/kg bodymass
+  maxResidualLevel: 234.567 # mg/kg bodymass
+  consumableLevel: 345.0 # mg/kg bodymass
+
+methomyl:
+  colour: green
+  LD50: 123.456 # mg/kg bodymass
+  maxResidualLevel: 234.567 # mg/kg bodymass
+  consumableLevel: 345.0 # mg/kg bodymass
+
+aldicarb:
+  colour: yellow
+  LD50: 123.456 # mg/kg bodymass
+  maxResidualLevel: 234.567 # mg/kg bodymass
+  consumableLevel: 345.0 # mg/kg bodymass
+
+lead:
+  colour: orange # Only if it rusted I guess.
+  LD50: 123.456 # mg/kg bodymass
+  maxResidualLevel: 234.567 # mg/kg bodymass
+  consumableLevel: 345.0 # mg/kg bodymass
+
+arsenic:
+  colour: red
+  LD50: 123.456 # mg/kg bodymass
+  maxResidualLevel: 234.567 # mg/kg bodymass
+  consumableLevel: 345.0 # mg/kg bodymass
+
+iron_maiden:
+  colour: black # All the fuckin time.
+  LD50: 123.456 # mg/kg bodymass
+  maxResidualLevel: 234.567 # mg/kg bodymass
+  consumableLevel: 345.0 # mg/kg bodymass
