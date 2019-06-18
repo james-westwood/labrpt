@@ -176,3 +176,26 @@ if __name__ == "__main__":
     args = getArgs()
     sys.exit(main(args))
 
+
+###TII (mg per individual)=Tolerable Daily Intake (mg/kg b.w.)*Body weight(kg b.w)###
+
+def calcTII(TDI,bw):
+    TII=TDI*bw
+    return TII
+
+###TCL (mg/kg(food)) =TII/Amount of food consumed(kg)=TII/AE###
+
+def calcTCL(TII,AE):
+    TCL=TII/AE
+    return TCL
+
+def calcFCIChem(AD,TCL):
+    FCIc=AD*TCL
+    return FCI
+
+##TODO: make a dict with chemname:FCIresult
+
+def calcFCIoverall(calcVars:dict): #I wanted to specify that the datatype should be a dictionary here
+    ## some way of identifying the highest FCI (FCI1), as that is treated differently.
+    ## some way of taking all other FCIs except the highest, squaring them, multiplying by 100 and adding them
+    ## add FCI1
