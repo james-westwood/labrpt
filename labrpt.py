@@ -183,19 +183,50 @@ def calcTII(TDI,bw):
     TII=TDI*bw
     return TII
 
+bw=75
+
+TDIsPulledfromDB={
+"chemical1":0.1,
+"chemical2":0.2,
+"chemical3":0.3,
+"chemical4":1.5,
+}
+
+
+TIIs={key:(calcTII(value,bw)) for key,value in TDIsPulledfromDB.items()}
+
 ###TCL (mg/kg(food)) =TII/Amount of food consumed(kg)=TII/AE###
 
 def calcTCL(TII,AE):
     TCL=TII/AE
     return TCL
 
+AE=0.25 #this is the amount eaten in kg. Making it a variable as we might want to redefine it elsewhere
+
+TCLresultsDict={key:calcTCL(value,AE) for key,value in TIIs.items()} #This should apply the calcTCL func to every TII value, dividing each by 0.25
+
 def calcFCIChem(AD,TCL):
-    FCIc=AD*TCL
-    return FCI
+    FCIc=AD*TCL #this still needs to be *100 but I think it's best to do that later
+    return FCIc
 
-##TODO: make a dict with chemname:FCIresult
+AmountsDetectedfromlab={
+"chemical1":0.085,
+"chemical2":0.1,
+"chemical3":0.02,
+"chemical4":0.1,
+} #pretend data. Really we want to pull these from the csv that the lab sent us
 
-def calcFCIoverall(calcVars:dict): #I wanted to specify that the datatype should be a dictionary here
-    ## some way of identifying the highest FCI (FCI1), as that is treated differently.
-    ## some way of taking all other FCIs except the highest, squaring them, multiplying by 100 and adding them
-    ## add FCI1
+##Create the FCI results dict
+FCIresultDict={key:(calcFCIChem(AmountsDetectedfromlab[key],value)) for key,value in TCLresultsDict.items()}
+
+##Geomean approach to calcualating the overall FCI
+
+###copied this method from here: https://bytes.com/topic/python/answers/727876-geometrical-mean
+
+def geomean(numbers):
+    product = 1
+    for n in numbers:
+        product *= n
+    return product ** (1.0/len(numbers))
+
+FCIoverall=geomean(FCIresultDict.values())
