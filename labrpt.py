@@ -1,3 +1,10 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[1]:
+
+
+# %load labrpt.py
 #!/usr/bin/env python3
 
 # Generate reports from lab results.
@@ -177,23 +184,71 @@ if __name__ == "__main__":
     sys.exit(main(args))
 
 
-###TII (mg per individual)=Tolerable Daily Intake (mg/kg b.w.)*Body weight(kg b.w)###
+# In[141]:
 
+
+with open('labdata0.csv') as csvfile:
+    reader = csv.DictReader(csvfile)
+    AmountsDetectedfromlab = {rows['Parameter']:float(rows['Result']) for rows in reader}
+
+
+# AmountsDetectedfromlab={
+# "chemical1":0.085,
+# "chemical2":0.1,
+# "chemical3":0.02,
+# "chemical4":0.1,
+# } #pretend data. Really we want to pull these from the csv that the lab sent us
+
+AmountsDetectedfromlab
+
+
+# In[171]:
+
+
+##Build dictionary from the chemical database, listing the TDI or ADI
+with open('Pesticide_database.csv') as csvfile:
+    reader = csv.DictReader(csvfile)
+    TDIsPulledfromDB = {rows['Pesticide Name']:rows['ADI'] for rows in reader}
+    for key,value in TDIsPulledfromDB.items(): ###convert any numerical ADIs into a float
+        try:
+            TDIsPulledfromDB[key]=float(value)
+        except:
+            pass
+TDIsPulledfromDB
+
+
+# In[145]:
+
+
+####I only want to look in the database for items that were actually detected in the lab.
+###So iterate through the key in AmountsDetectedfromlab which will give the chemical names
+### and return a dictionary of chemical_name:TDI
+
+TDIsNeeded = {key.split()[0]: (TDIsPulledfromDB[(key.split()[0])]) for key in AmountsDetectedfromlab.keys()}
+
+TDIsNeeded
+
+
+# In[153]:
+
+
+###TII (mg per individual)=Tolerable Daily Intake (mg/kg b.w.)*Body weight(kg b.w)###
+# Define body weight
+bw=75
+
+###Define function to calculate the tolerable intake per person for each chemical
+### multiply the TDI by the bodyweight
 def calcTII(TDI,bw):
     TII=TDI*bw
     return TII
 
-bw=75
+TIIS={key:calcTII(TDIsPulledfromDB[key.split()[0]],bw) for key in AmountsDetectedfromlab.keys()}
 
-TDIsPulledfromDB={
-"chemical1":0.1,
-"chemical2":0.2,
-"chemical3":0.3,
-"chemical4":1.5,
-}
+TIIS
 
 
-TIIs={key:(calcTII(value,bw)) for key,value in TDIsPulledfromDB.items()}
+# In[162]:
+
 
 ###TCL (mg/kg(food)) =TII/Amount of food consumed(kg)=TII/AE###
 
@@ -201,32 +256,85 @@ def calcTCL(TII,AE):
     TCL=TII/AE
     return TCL
 
-AE=0.25 #this is the amount eaten in kg. Making it a variable as we might want to redefine it elsewhere
+AE=0.25 #this is the amount eaten in kg. Want this input on command line
 
-TCLresultsDict={key:calcTCL(value,AE) for key,value in TIIs.items()} #This should apply the calcTCL func to every TII value, dividing each by 0.25
+TCLresultsDict={key:calcTCL(value,AE) for key,value in TIIS.items()} #This should apply the calcTCL func to every TII value, dividing each by 0.25
+TCLresultsDict
 
-def calcFCIChem(AD,TCL):
-    FCIc=AD*TCL #this still needs to be *100 but I think it's best to do that later
+
+# In[155]:
+
+
+
+##Define a function to claculate the Concern Index for any chemical
+def calcCIChem(AD,TCL):
+    FCIc=AD/TCL #this still needs to be *100 but I think it's best to do that later
     return FCIc
 
-AmountsDetectedfromlab={
-"chemical1":0.085,
-"chemical2":0.1,
-"chemical3":0.02,
-"chemical4":0.1,
-} #pretend data. Really we want to pull these from the csv that the lab sent us
+#Calculate the Concern index for each chemical (Amount detected/TCL)
+##Create the CI results dict
+ChemicalCIresultDic={key:(calcCIChem(AmountsDetectedfromlab[key],value)) for key,value in TCLresultsDict.items()}
 
-##Create the FCI results dict
-FCIresultDict={key:(calcFCIChem(AmountsDetectedfromlab[key],value)) for key,value in TCLresultsDict.items()}
+ChemicalCIresultDic
 
-##Geomean approach to calcualating the overall FCI
 
-###copied this method from here: https://bytes.com/topic/python/answers/727876-geometrical-mean
+# In[156]:
 
-def geomean(numbers):
-    product = 1
-    for n in numbers:
-        product *= n
-    return product ** (1.0/len(numbers))
 
-FCIoverall=geomean(FCIresultDict.values())
+#find the chemical with the max value
+highestCI=max(ChemicalCIresultDic, key=ChemicalCIresultDic.get)
+highestCI
+
+
+# In[157]:
+
+
+keylst=list(ChemicalCIresultDic.keys())
+keylst.remove(highestCI)
+keylst
+
+
+# In[21]:
+
+
+# ##Geomean approach
+# ###copied this method from here: https://bytes.com/topic/python/answers/727876-geometrical-mean
+
+
+
+# def geomean(numbers):
+#     product = 1
+#     for n in numbers:
+#         product *= n
+#     return product ** (1.0/len(numbers))
+
+# FCIoverall=geomean(FCIresultDict.values())
+# FCIoverall
+
+
+# In[181]:
+
+
+###Calculate the Overall-FCI for all except the highest
+###~~~FCI=AD1TCL1*100+AD2TCL22*100+AD3TCL32*100...ADnTCLn2*100
+
+def calcCI_low(CI):
+    return ((CI**2))*100
+
+### run CalcOverallFCI on all except the highest
+totalFCI=0
+for chem in keylst:
+    totalFCI+=(calcCI_low(ChemicalCIresultDic[chem]))
+
+
+def calcCI_highest(CI):
+    return(CI*100)
+
+totalFCI=int(+(calcCI_highest(ChemicalCIresultDic[highestCI])))
+print("Overall Food Concern Index =",totalFCI)
+
+
+# In[ ]:
+
+
+#
