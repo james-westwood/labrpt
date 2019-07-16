@@ -145,27 +145,43 @@ def main(args): # {{{
     verb("Reading database... ", end='')
     with open(args.db, 'r') as fd:
         db = yaml.safe_load(fd)
+    TDIsPulledfromDB = {(item["Pesticide Name"]).lower(): item['ADI'] for item in db}
+    verb("Imported Database")
+    for key,value in TDIsPulledfromDB.items(): ###convert any numerical ADIs into a float
+        try:
+            TDIsPulledfromDB[key]=float(value)
+        except:
+            pass #some have none numerical values so need to pass exceptions
     verb("Done")
+
 
     # Read in entire copy corpus into a dict (Map).
     # Access values like: corpus["carbaryl"]
     verb("Reading corpus... ", end='')
     with open(args.corpus, 'r') as fd:
         corpus = yaml.safe_load(fd)
-    verb("Done")
+    with open('copycorpus.yml', 'r') as fd:
+    corpus = yaml.safe_load(fd)
+    for item in corpus:
+        item['']=(item['']).lower() #making all pesticide names lowercase
+        item['Pesticide Name']=item.pop('') #For some reason when the yaml was imported the pesticdes were all given the key ''
+    verb("Corpus read")
+
 
     verb("There are %d files to process" % len(args.fnames))
     for fnamei in args.fnames:
         fnameo = fnamei + ".txt"
+        
 
         # Read in lab results CSV line by line.
         # Analyse and decide what pieces of copy text to use.
         verb("Reading CSV %s... " % fnamei, end='')
         with open(fnamei, 'r', newline='') as fd:
-
+            reader = csv.DictReader(fd)
             fdUncomment = filter(notCommentLine, fd)
             fdClean = map(deduplicateSpaces, fdUncomment)
             reader = csv.reader(fdClean, delimiter=args.delimiter)
+            labresults= {(rows['Parameter']).lower():float(rows['Result']) for rows in reader} #This should give us just the results. The name of the chemical and the amount detected
 
             state = {}
             for rowNum,row in enumerate(reader):
@@ -205,16 +221,7 @@ AmountsDetectedfromlab
 # In[171]:
 
 
-##Build dictionary from the chemical database, listing the TDI or ADI
-with open('Pesticide_database.csv') as csvfile:
-    reader = csv.DictReader(csvfile)
-    TDIsPulledfromDB = {rows['Pesticide Name']:rows['ADI'] for rows in reader}
-    for key,value in TDIsPulledfromDB.items(): ###convert any numerical ADIs into a float
-        try:
-            TDIsPulledfromDB[key]=float(value)
-        except:
-            pass
-TDIsPulledfromDB
+
 
 
 # In[145]:
