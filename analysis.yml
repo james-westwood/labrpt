@@ -1,0 +1,31 @@
+intro:
+    "A Food Concern Index of {FCI} was calculated for this product; this benchmarks the lab results against the tolerable daily intake for each contaminant detected. Read more about allowed levels and our Concern Index on our FAQ."
+100+_p:
+    "{pest_nm} was/were detected in the food sample at {AD} mg/kg. Our calculations show if you ate {portion}g of this food you might consume more than acceptable amounts of {pest_nm} for an average {human}."
+85-100_p: |
+    aheader
+    ======
+
+    foo bar
+
+    {pest_nm} was/were detected at levels that resulted in an FCI score of {FCI}.
+    This/These scores are high for {pest_nm}, which indicates if you eat a
+     standard portion of this food, you would come close to reaching your
+     tolerable daily limit of the contaminant(s) we found, therefore you may want to avoid this food.
+
+adult_calc:
+    "This result might be a special consideration if you or your family members are in a vulnerable group, such as infants, elderly, or those with chronic health conditions."
+5-85_p:
+    "At the levels {pest_nm} was/were  detected we calculate that if you ate a standard portion of the food you are unlikely to go over the tolerable daily intake for this/these pesticide(s)."
+add_5-50_p:
+    "[NAMES OF PESTICIDES THAT SCORE LESS THAN 50], detected at [WRITE THE AMOUNTS DETECTED], scored moderately low with an FCI score(s) of [write the scores]."
+add_50-85_p:
+    "[NAMES OF PESTICIDES THAT SCORE LESS THAN 50] score medium-high score which is slightly more concerning. However at these levels that the health of the general public are unlikely to be affected by the pesticides, but you may want to limit this food if you or your family members are in a vulnerable group, such as infants, elderly, or those with chronic illnesses."
+0-5_p:
+    "{pest_nm} was/were  detected at extremely low levels, according to our calculations is low on the Concern Index. This means that this food is considered not very contaminated and if you ate a standard portion you are unlikely to come close to exceeding the tolerable daily intake for this/these chemicals."
+ND_p:
+    "None of the 420 pesticides we tested for were detected, which means that according to these results, this  food sample has passed and is considered not contaminated. Note, although the tests are extensive no test can rule out all possible contaminants. Our tests are selected by chemists to focus on the highest risk contaminants."
+FCI_less_25:
+    " Since the level of contamination is low, if you like this food, continue to enjoy it with confidence that it passed the tests."
+FCI_100+:
+    "If you are concerned about the levels of contaminants detected, then you may wish to stop consuming this product as continued regular exposure to pesticides may lead to a range of health effects."
